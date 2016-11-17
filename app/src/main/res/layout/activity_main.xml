@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.crystal.simpleslidinguppanel.widget.SimpleSlidingUpPanel
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/activity_main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:dragHeadPanelHeight="@dimen/drag_head_panel_height">
+
+    <!-- Main View -->
+    <FrameLayout
+        android:id="@+id/main_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginBottom="@dimen/drag_head_panel_height">
+        
+        <ListView
+            android:id="@+id/lv_mainview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"></ListView>
+    </FrameLayout>
+
+    <!-- Sliding Panel -->
+    <LinearLayout
+        android:id="@+id/drag_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:clickable="true"
+        android:focusable="false"
+        android:background="#ffffff"
+        android:orientation="vertical">
+
+        <!-- drag head -->
+        <LinearLayout
+            android:id="@+id/drag_head_view"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/drag_head_panel_height"
+            android:background="@color/colorAccent"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:textColor="@android:color/white"
+                android:textSize="18dp"
+                android:gravity="center"
+                android:text="拉我呗！"/>
+        </LinearLayout>
+
+        <ListView
+            android:id="@+id/lv_dragview"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+    </LinearLayout>
+
+</com.crystal.simpleslidinguppanel.widget.SimpleSlidingUpPanel>
