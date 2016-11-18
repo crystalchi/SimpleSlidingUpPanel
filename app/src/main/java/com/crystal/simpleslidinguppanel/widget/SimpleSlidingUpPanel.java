@@ -123,12 +123,15 @@ public class SimpleSlidingUpPanel extends ViewGroup{
                 lp.leftMargin + paddingLeft + mDragView.getMeasuredWidth(),
                 dragViewTop + mDragView.getMeasuredHeight()
         );
+
+
     }
 
     @Override
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
         mDragRange = getHeight() - mDragHeadPanelHeight;
+        Log.d(TAG, "dragview top is " +  mDragView.getTop());
     }
 
     /**
@@ -156,7 +159,7 @@ public class SimpleSlidingUpPanel extends ViewGroup{
         //拦截事件并将事件交给ViewDragHelper
         boolean interceptResult = mViewDragHelper.shouldInterceptTouchEvent(ev);
         Log.d(TAG, "interceptResult is " + interceptResult);
-        return interceptResult || interceptTap;
+        return interceptResult /*|| interceptTap*/;
     }
 
     /**
@@ -347,5 +350,7 @@ public class SimpleSlidingUpPanel extends ViewGroup{
         return screenX >= viewLocation[0] && screenX < viewLocation[0] + view.getWidth() &&
                 screenY >= viewLocation[1] && screenY < viewLocation[1] + view.getHeight();
     }
+
+
 
 }
