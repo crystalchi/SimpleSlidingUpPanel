@@ -131,6 +131,11 @@ public class SimpleSlidingUpPanel extends ViewGroup{
         mDragRange = getHeight() - mDragHeadPanelHeight;
     }
 
+    /**
+     * 拦截事件交给ViewDragHelper
+     * @param ev
+     * @return
+     */
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
         final int action = MotionEventCompat.getActionMasked(ev);
@@ -139,6 +144,7 @@ public class SimpleSlidingUpPanel extends ViewGroup{
         boolean interceptTap = false;
         switch (action){
             case MotionEvent.ACTION_DOWN:
+                //判断触摸的是DragHeadView
                 if(isViewUnder(mDragHeadView, (int) x, (int) y)){
                     interceptTap = true;
                 }
@@ -147,17 +153,26 @@ public class SimpleSlidingUpPanel extends ViewGroup{
         if(mTop == 0 && mScrollableView.getFirstVisiblePosition() != 0){
             mScrollableView.requestDisallowInterceptTouchEvent(true);
         }
+        //拦截事件并将事件交给ViewDragHelper
         boolean interceptResult = mViewDragHelper.shouldInterceptTouchEvent(ev);
         Log.d(TAG, "interceptResult is " + interceptResult);
         return interceptResult || interceptTap;
     }
 
+    /**
+     * 在此事件中传递事件给ViewDragHelper
+     * @param event
+     * @return
+     */
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         mViewDragHelper.processTouchEvent(event);
         return true;
     }
 
+    /**
+     * 加载完毕，在这个方法中可以获取布局中的view
+     */
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
@@ -165,16 +180,30 @@ public class SimpleSlidingUpPanel extends ViewGroup{
         mScrollableView = (ListView) findViewById(R.id.lv_dragview);
     }
 
+    /**
+     * 为添加到当前ViewGroup的子View添加与当前ViewGroup匹配的LayoutParams
+     * @param p
+     * @return
+     */
     @Override
     protected LayoutParams generateLayoutParams(LayoutParams p) {
         return new MarginLayoutParams(p);
     }
 
+    /**
+     * 为添加到当前ViewGroup的子View添加与当前ViewGroup匹配的LayoutParams
+     * @param attrs
+     * @return
+     */
     @Override
     public LayoutParams generateLayoutParams(AttributeSet attrs) {
         return new MarginLayoutParams(getContext(), attrs);
     }
 
+    /**
+     * 为添加到当前ViewGroup的子View添加与当前ViewGroup匹配的LayoutParams
+     * @return
+     */
     @Override
     protected LayoutParams generateDefaultLayoutParams() {
         return new MarginLayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
@@ -232,52 +261,24 @@ public class SimpleSlidingUpPanel extends ViewGroup{
         @Override
         public void onViewReleased(View releasedChild, float xvel, float yvel) {
             super.onViewReleased(releasedChild, xvel, yvel);
-            /*int top = 0;
-            Log.d(TAG, "yvel , mDragOffset is " + yvel + " , " + mDragOffset);
-            if(yvel < 0 && mDragOffset < TAG_VALUE / 2){
-                top = calPanelTop(0.0f);
-            }else if(mDragOffset >= TAG_VALUE / 2 && mDragOffset <= 0.8){
-                top = calPanelTop(0.5f);
-            }else if(mDragOffset > 0.8){
-                top = calPanelTop(1.0f);
-            }
-            if(yvel > 0 && mDragOffset > TAG_VALUE / 2){
-                top = calPanelTop(0.0f);
-            }else if(yvel > 0 && mDragOffset <= TAG_VALUE / 2){
-                top = calPanelTop(1.0f);
-            }
-
-            if(yvel == 0.0){
-                top = calPanelTop(mDragOffset);
-            }
-            Log.d(TAG, "top is " + top);
-            mViewDragHelper.settleCapturedViewAt(releasedChild.getLeft(), top);
-            invalidate();*/
-
-            float direction =  -yvel;
             int top = 0;
-            if (direction > 0 && mDragOffset <= TAG_VALUE) {
-                // swipe up -> expand and stop at anchor point
+            float direction = yvel; //direction > 0 代表向下拖动，direction < 0 代表向上拖动。
+            if(direction < 0 && mDragOffset <= TAG_VALUE){
                 top = calPanelTop(TAG_VALUE);
-                //Log.d(TAG, "expand and stop at anchor point == mSlideOffset , mAnchorPoint , target is " + mSlideOffset + " , " + mAnchorPoint + " , " + target);
-            }else if(mDragOffset >= TAG_VALUE / 2 && mDragOffset <= TAG_VALUE * 0.8){
-                //Log.d(TAG, "half...");
-                top = calPanelTop(0.5f);
-            } else if (direction < 0 && mDragOffset < TAG_VALUE) {
-                // swipe down past anchor -> collapse
+            }else if(mDragOffset >= TAG_VALUE / 2 && mDragOffset <= TAG_VALUE / 10 * 8){
+                top = calPanelTop(TAG_VALUE / 2);
+            }else if(direction > 0 && mDragOffset <= TAG_VALUE){
                 top = calPanelTop(0.0f);
-                //Log.d(TAG, "collapse == mSlideOffset , mAnchorPoint , target is " + mSlideOffset + " , " + mAnchorPoint + " , " + target);
-            } else if (mDragOffset >= TAG_VALUE / 2) {
-                // zero velocity, and close enough to anchor point => go to anchor
+            }else if(mDragOffset > TAG_VALUE / 2){
                 top = calPanelTop(TAG_VALUE);
-
-            } else if(mDragOffset < TAG_VALUE / 2){
+            }else if(mDragOffset < TAG_VALUE / 2){
                 top = calPanelTop(0.0f);
             }
             mViewDragHelper.settleCapturedViewAt(releasedChild.getLeft(), top);
             invalidate();
         }
     }
+
 
     @Override
     public void computeScroll() {
@@ -327,6 +328,13 @@ public class SimpleSlidingUpPanel extends ViewGroup{
        return  mDragRange - (int)(dragOffset * mDragRange);
     }
 
+    /**
+     * 判断触摸的是DragHeadView
+     * @param view
+     * @param x
+     * @param y
+     * @return
+     */
     private boolean isViewUnder(View view, int x, int y) {
         if (view == null) return false;
         int[] viewLocation = new int[2];
@@ -335,9 +343,7 @@ public class SimpleSlidingUpPanel extends ViewGroup{
         this.getLocationOnScreen(parentLocation);
         int screenX = parentLocation[0] + x;
         int screenY = parentLocation[1] + y;
-
-        Log.d(TAG , "view.getWidth() is " + view.getWidth());
-        Log.d(TAG , "view.getWidth() is " + view.getWidth());
+        //判断触摸点是在view范围内，其实就是触摸就是DragHeadView.
         return screenX >= viewLocation[0] && screenX < viewLocation[0] + view.getWidth() &&
                 screenY >= viewLocation[1] && screenY < viewLocation[1] + view.getHeight();
     }
